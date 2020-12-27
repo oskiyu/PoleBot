@@ -47,10 +47,10 @@ async def on_message(message):
             return "oskiyu.txt"
     
         
-    if message.content == 'PoleBot di algo':
+    if message.content.lower() == 'polebot di algo':
         response = random.choice(Frases)
         await message.channel.send(response)
-    if message.content == 'PoleBot eres gei':
+    if message.content.lower() == 'polebot eres gei':
             response = 'Tu si que eres gei, ' + message.author.name + '.'
             await message.channel.send(response)
     if message.content.lower() == 'pole':
@@ -108,7 +108,8 @@ async def on_message(message):
             L = [str(LastPoleDate.day)+"\n", str(LastPoleDate.month)+'\n', str(LastPoleDate.year)+'\n'] 
             data.writelines(L)
             data.close()
-    if message.content == 'PoleBot ranking':
+    if message.content.lower() == 'polebot ranking':
+
         data = open("charlie.txt","r")
         score1 = int (data.readline())
         data.close()
@@ -121,6 +122,21 @@ async def on_message(message):
         data = open("oskiyu.txt","r") 
         score4 = int (data.readline())
         data.close()
-        response = 'charlie: '  + str(score1) + '\n' +'martilux: ' + str(score2) + '\n' +'moha: ' + str(score3) + '\n' +'oskiyu: ' + str(score4)
+        scores = [['charlie: ',score1],['martilux: ',score2],['moha: ' ,score3],['oskiyu: ',score4]]
+        for mx in range(len(scores)-1, -1, -1):
+            swapped = False
+            for i in range(mx):
+                if scores[i][1] < scores[i+1][1]:
+                    scores[i], scores[i+1] = scores[i+1], scores[i]
+                    swapped = True
+            if not swapped:
+                break
+        response = scores[0][0]  + str(scores[0][1] ) + '\n' +scores[1][0]  + str(scores[1][1] ) + '\n' +scores[2][0]  + str(scores[2][1] ) + '\n' +scores[3][0]  + str(scores[3][1] )
+        await message.channel.send(response)
+    if message.content.lower() == 'polebot ayuda':
+        response = 'Comandos:'+ '\n' + 'polebot ranking: Muestra el ranking de poles' + '\n' + 'polebot di algo: El bot dice una frase aleatoria' + '\n' + 'polebot version: La versión del bot'
+        await message.channel.send(response)
+    if message.content.lower() == 'polebot version':
+        response = 'PoleBot Versión Alpha 0.0.1 por CharlieC' 
         await message.channel.send(response)
 client.run(TOKEN)
