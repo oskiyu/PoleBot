@@ -2,6 +2,8 @@ import os
 import random
 import discord
 import datetime
+
+
 from datetime import timedelta
 from dotenv import load_dotenv
 
@@ -134,9 +136,61 @@ async def on_message(message):
         response = scores[0][0]  + str(scores[0][1] ) + '\n' +scores[1][0]  + str(scores[1][1] ) + '\n' +scores[2][0]  + str(scores[2][1] ) + '\n' +scores[3][0]  + str(scores[3][1] )
         await message.channel.send(response)
     if message.content.lower() == 'polebot ayuda':
-        response = 'Comandos:'+ '\n' + 'polebot ranking: Muestra el ranking de poles' + '\n' + 'polebot di algo: El bot dice una frase aleatoria' + '\n' + 'polebot version: La versión del bot'
+        response = 'Comandos:'+ '\n' + 'polebot ranking: Muestra el ranking de poles' + '\n' + 'polebot di algo: El bot dice una frase aleatoria' + '\n' + 'polebot version: La versión del bot' '\n' + 'polebot git: Link al repositorio del polebot. Contribuye al polebot o consulta el código'+ '\n' + 'polebot si o no: ¿Una decisión importante?,deja que polebot decida por ti' + '\n' + "polebot ppt: Una partidita de piedra, papel o tijeras con el polebot" 
+        await message.channel.send(response)
+    if message.content.lower() == 'polebot git':
+        response = 'https://github.com/cva21/PoleBot'
         await message.channel.send(response)
     if message.content.lower() == 'polebot version':
-        response = 'PoleBot Versión Alpha 0.0.1 por CharlieC' 
+        response = 'PoleBot Versión Alpha 0.0.2 por CharlieC' + '\n' + 'Última actualización : 16/01/2021'
+        await message.channel.send(response)    
+    if message.content.lower() == 'polebot si o no':
+        respuestas = ["si","no"]
+        response = random.choice(respuestas)
         await message.channel.send(response)
+    if message.content.lower() == 'polebot ppt':    
+        #create a list of play options
+        t = ["piedra", "papel", "tijeras"]
+        #assign a random play to the computer
+        computer = t[random.randint(0,2)]
+
+        #set player to False
+        player = False
+       
+        response = "Piedra, Papel o Tijeras perro"
+        await message.channel.send(response)
+
+        while player == False:
+            players = await client.wait_for('message')
+            if players.content.lower() == computer:              
+                response = "Empate, me has leido la mente cabron" 
+                player = True
+            elif players.content.lower() == "piedra":
+                if computer == "papel":
+                    response = "Te jodes, el papel cubre a la piedra gei"
+                    player = True     
+                else:
+                    response = "Pff, romperás mis " + computer + " pero te rompo la cara"  
+                    player = True  
+            elif players.content.lower() == "papel":
+                if computer == "tijeras":
+                    response = "JA!, las tijeras cortan el papel pelota"  
+                    player = True
+                else: 
+                    response = "Buah, habia elegido " + computer + " pero eres un puto pelota y lo sabes" 
+                    player = True
+            elif players.content.lower() == "tijeras":
+                if computer == "piedra":
+                    response = "TOMA!, la piedra rompe a las tijeras, como lo que yo le rompo a tu novia todas las noches." 
+                    player = True
+                else:
+                    response = "Pff, habré perdido por elegir " + computer + " pero jamás tendrás una gótica culona la que tengo yo"  
+                    player = True 
+            else:
+                response = "cabron, ¿eres retrasado o que?, piedra papel o tijera."
+                player = False
+                
+        #player was set to True, but we want it to be False so the loop continues
+            await message.channel.send(response)           
+            computer = t[random.randint(0,2)]
 client.run(TOKEN)
