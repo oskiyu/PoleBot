@@ -1,4 +1,4 @@
-# PoleBot V0.0.1
+# PoleBot V0.0.2
 ## :heavy_exclamation_mark: Aviso :heavy_exclamation_mark:
 Esta es una versión de prueba de PoleBot, Polebot está aún en desarrollo y aún necesita ser optimizado.
 ## Historial de cambios 📋
