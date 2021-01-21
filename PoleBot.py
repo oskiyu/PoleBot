@@ -35,12 +35,15 @@ async def on_message(message):
         'martilux gei',
         'oskiyu regei',
         'moha pelota',
-        'charlie es el mejor desarrollador de bots'
-        'charlie gei'
-        'charlie regei'
-        'charlie supergei'
-        'charlie MEGAgei'
-        'charlie MASTERGEI'
+        'charlie es el mejor desarrollador de bots',
+        'charlie gei',
+        'charlie regei',
+        'charlie supergei',
+        'charlie MEGAgei',
+        'charlie MASTERGEI',
+        'oskiyu regei',
+        'oskiyu superguei',
+        'oskiyu MASTERGEI'
     ]
     def calcularRanking(name):
         """interpreta el nombre del usuario"""
