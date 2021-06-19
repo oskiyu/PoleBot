@@ -199,7 +199,7 @@ async def on_message(message):
         response = 'RANKING HISTORICO:' + '\n' +scores[0][0]  + str(scores[0][1] ) + '\n' +scores[1][0]  + str(scores[1][1] ) + '\n' +scores[2][0]  + str(scores[2][1] ) + '\n' +scores[3][0]  + str(scores[3][1] )
         await message.channel.send(response)
     if message.content.lower() == 'polebot ayuda':
-        response = 'Comandos:'+ '\n' + 'polebot ranking: Muestra el ranking de poles' + '\n' + 'polebot di algo: El bot dice una frase aleatoria' + '\n' + 'polebot version: La versión del bot' '\n' + 'polebot git: Link al repositorio del polebot. Contribuye al polebot o consulta el código'+ '\n' + 'polebot si o no: ¿Una decisión importante?,deja que polebot decida por ti' + '\n' + "polebot ppt: Una partidita de piedra, papel o tijeras con el polebot" 
+        response = 'Comandos:'+ '\n' + 'polebot ranking: Muestra el ranking de poles' + '\n' + 'polebot ranking historico: Muestra el ranking historico de poles' + '\n' + 'polebot ranking season 1: Muestra el ranking de poles de la season 1'+ '\n' + 'polebot di algo: El bot dice una frase aleatoria' + '\n' + 'polebot version: La versión del bot' '\n' + 'polebot git: Link al repositorio del polebot. Contribuye al polebot o consulta el código'+ '\n' + 'polebot si o no: ¿Una decisión importante?,deja que polebot decida por ti' + '\n' + "polebot ppt: Una partidita de piedra, papel o tijeras con el polebot" 
         await message.channel.send(response)
     if message.content.lower() == 'polebot git':
         response = 'https://github.com/cva21/PoleBot'
