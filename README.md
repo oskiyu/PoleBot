@@ -9,7 +9,7 @@ Muestra el ranking historico de puntos del bot
 -Nuevo comando: polebot season 1
 Muestra el ranking de la season 1
 -Cambio en el sistema de puntuación:
-Si la distancia entre ti y el el anterior si es mayor a 40 puntos ganaras una decima parte de la distancia al primero.
+Si la distancia entre ti y el el anterior si es mayor a 40 puntos ganas el doble de puntos
 ```  
 ### Versión 0.0.2: 
 ```
