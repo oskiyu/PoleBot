@@ -45,18 +45,43 @@ async def on_message(message):
         'oskiyu superguei',
         'oskiyu MASTERGEI'
     ]
-    def calcularRanking(name):
+    def calcularNombre(name):
+        #No puedo poner el nombre directamente por el nombre del moha de polla 
         """interpreta el nombre del usuario"""
         if name == "charliec":
             return "charlie.txt"
-        if name == "Mister Man":  
+        if name == "Mister Meme":  
             return "moha.txt"
         if name == "martilux2580":  
             return "martilux.txt"
         if name == "oskiyu": 
             return "oskiyu.txt"
-    
-        
+    def calcularDistanciaAnterior(name):
+        data = open("charlie.txt","r")
+        score1 = float (data.readline())
+        data.close()
+        data = open("martilux.txt","r") 
+        score2 = float (data.readline())
+        data.close()
+        data = open("moha.txt","r") 
+        score3 = float (data.readline())
+        data.close()
+        data = open("oskiyu.txt","r") 
+        score4 = float (data.readline())
+        data.close()
+        scores = [['charliec',score1],['martilux2580',score2],['Mister Meme' ,score3],['oskiyu',score4]]
+        for mx in range(len(scores)-1, -1, -1):
+            swapped = False
+            for i in range(mx):
+                if scores[i][1] < scores[i+1][1]:
+                    scores[i], scores[i+1] = scores[i+1], scores[i]
+                    swapped = True
+            if not swapped:
+                break
+        for i in range(len(scores)):
+            if scores[i][0] == name:
+                return scores[i-1][1] - scores[i][1]
+                
     if message.content.lower() == 'polebot di algo':
         response = random.choice(Frases)
         await message.channel.send(response)
@@ -78,14 +103,18 @@ async def on_message(message):
             L = [str(LastPoleDate.day)+"\n", str(LastPoleDate.month)+'\n', str(LastPoleDate.year)+'\n'] 
             data.writelines(L)
             data.close()
-            data = open(calcularRanking(message.author.name),"r")
-            score = int (data.readline())
-            score = score+2
+            data = open(calcularNombre(message.author.name),"r")
+            score = float (data.readline())
+            distancia = calcularDistanciaAnterior(message.author.name)
+            if distancia>40:
+                score = score+distancia/10
+                response = message.author.name + ' ha hecho la pole.' + ' ¡Puntos aumentados por ir muy lejos de tu rival!' + ' Puntos obtenidos: '+ str(distancia/10)
+            else:
+                score = score+2
+                response = message.author.name + ' ha hecho la pole.' 
             data.close()
-            data = open(calcularRanking(message.author.name),"w")
+            data = open(calcularNombre(message.author.name),"w")
             data.write(str(score))
-            response = message.author.name + ' ha hecho la pole.' 
-
             await message.channel.send(response)
         else:
             L = [str(LastPoleDate.day)+"\n", str(LastPoleDate.month)+'\n', str(LastPoleDate.year)+'\n'] 
@@ -107,11 +136,11 @@ async def on_message(message):
             data.writelines(L)
             response = message.author.name + ' ha hecho la subpole.' 
             data.close()
-            data = open(calcularRanking(message.author.name),"r")
-            score = int (data.readline())
+            data = open(calcularNombre(message.author.name),"r")
+            score = float (data.readline())
             score = score+1
             data.close()
-            data = open(calcularRanking(message.author.name),"w")
+            data = open(calcularNombre(message.author.name),"w")
             data.write(str(score))
             await message.channel.send(response)
         else:
@@ -121,18 +150,18 @@ async def on_message(message):
     if message.content.lower() == 'polebot ranking':
 
         data = open("charlie.txt","r")
-        score1 = int (data.readline())
+        score1 = float (data.readline())
         data.close()
         data = open("martilux.txt","r") 
-        score2 = int (data.readline())
+        score2 = float (data.readline())
         data.close()
         data = open("moha.txt","r") 
-        score3 = int (data.readline())
+        score3 = float (data.readline())
         data.close()
         data = open("oskiyu.txt","r") 
-        score4 = int (data.readline())
+        score4 = float (data.readline())
         data.close()
-        scores = [['charlie: ',score1],['martilux: ',score2],['moha: ' ,score3],['oskiyu: ',score4]]
+        scores = [['charlie :third_place: : ',score1],['martilux :first_place: : ',score2],['moha: ' ,score3],['oskiyu :second_place: : ',score4]]
         for mx in range(len(scores)-1, -1, -1):
             swapped = False
             for i in range(mx):
@@ -141,7 +170,33 @@ async def on_message(message):
                     swapped = True
             if not swapped:
                 break
-        response = scores[0][0]  + str(scores[0][1] ) + '\n' +scores[1][0]  + str(scores[1][1] ) + '\n' +scores[2][0]  + str(scores[2][1] ) + '\n' +scores[3][0]  + str(scores[3][1] )
+        response = 'RANKING:' + '\n' +scores[0][0]  + str(scores[0][1] ) + '\n' +scores[1][0]  + str(scores[1][1] ) + '\n' +scores[2][0]  + str(scores[2][1] ) + '\n' +scores[3][0]  + str(scores[3][1] )
+        await message.channel.send(response)
+    if message.content.lower() == 'polebot ranking historico':
+
+        data = open("charlie.txt","r")
+        score1 = float (data.readline())
+        data.close()
+        data = open("martilux.txt","r") 
+        score2 = float (data.readline())
+        data.close()
+        data = open("moha.txt","r") 
+        score3 = float (data.readline())
+        data.close()
+        data = open("oskiyu.txt","r") 
+        score4 = float (data.readline())
+        data.close()
+        #TODO: cambiar para la proxima season la forma de los scores
+        scores = [['charlie :third_place: : ',score1+95],['martilux :first_place: : ',score2+278],['moha: ' ,score3+70],['oskiyu :second_place: : ',score4+115]]
+        for mx in range(len(scores)-1, -1, -1):
+            swapped = False
+            for i in range(mx):
+                if scores[i][1] < scores[i+1][1]:
+                    scores[i], scores[i+1] = scores[i+1], scores[i]
+                    swapped = True
+            if not swapped:
+                break
+        response = 'RANKING HISTORICO:' + '\n' +scores[0][0]  + str(scores[0][1] ) + '\n' +scores[1][0]  + str(scores[1][1] ) + '\n' +scores[2][0]  + str(scores[2][1] ) + '\n' +scores[3][0]  + str(scores[3][1] )
         await message.channel.send(response)
     if message.content.lower() == 'polebot ayuda':
         response = 'Comandos:'+ '\n' + 'polebot ranking: Muestra el ranking de poles' + '\n' + 'polebot di algo: El bot dice una frase aleatoria' + '\n' + 'polebot version: La versión del bot' '\n' + 'polebot git: Link al repositorio del polebot. Contribuye al polebot o consulta el código'+ '\n' + 'polebot si o no: ¿Una decisión importante?,deja que polebot decida por ti' + '\n' + "polebot ppt: Una partidita de piedra, papel o tijeras con el polebot" 
@@ -149,8 +204,11 @@ async def on_message(message):
     if message.content.lower() == 'polebot git':
         response = 'https://github.com/cva21/PoleBot'
         await message.channel.send(response)
+    if message.content.lower() == 'polebot ranking season 1':
+        response = 'RANKING SEASON 1: ' + '\n' + ':first_place: martilux: 278' + '\n' + ':second_place: oskiyu: 115' + '\n' + ':third_place: charlie: 95' + '\n' + 'moha: 70'
+        await message.channel.send(response)    
     if message.content.lower() == 'polebot version':
-        response = 'PoleBot Versión Alpha 0.0.2 por CharlieC' + '\n' + 'Última actualización : 16/01/2021'
+        response = 'PoleBot Versión Alpha 0.0.3 por CharlieC' + '\n' + 'Última actualización : 19/06/2021'
         await message.channel.send(response)    
     if message.content.lower() == 'polebot si o no':
         respuestas = ["si","no"]
@@ -201,4 +259,5 @@ async def on_message(message):
         #player was set to True, but we want it to be False so the loop continues
             await message.channel.send(response)           
             computer = t[random.randint(0,2)]
+
 client.run(TOKEN)
