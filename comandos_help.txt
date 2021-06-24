@@ -1,0 +1,9 @@
+Comandos: 
+    polebot ranking: Muestra el ranking de poles
+    polebot ranking historico: Muestra el ranking historico de poles
+    polebot ranking season 1: Muestra el ranking de poles de la season 1
+    polebot di algo: El bot dice una frase aleatoria
+    polebot version: La versión del bot
+    polebot git: Link al repositorio del polebot. Contribuye al polebot o consulta el código
+    polebot si o no: ¿Una decisión importante?,deja que polebot decida por ti
+    polebot ppt: Una partidita de piedra, papel o tijeras con el polebot

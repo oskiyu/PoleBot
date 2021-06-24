@@ -8,8 +8,25 @@ from datetime import timedelta
 from dotenv import load_dotenv
 
 USUARIOS = ['charliec', 'martilux2580', 'Mister Meme', 'oskiyu']
-        
-def get_fecha_ultima_pole():
+       
+
+def read_lineas_archivo(path : str):
+    '''
+    str -> list(str)
+
+    Devuelve el contenido del archivo como una lista de strings.
+    Cada string es una línea del archivo.
+    '''
+    output = []
+
+    with open(path, 'r') as file:
+        for linea in file:
+            output.append(linea)
+
+    return output
+
+
+def read_fecha_ultima_pole():
     '''
     Devuelve la fecha de la última pole, en formato datetime.
 
@@ -20,11 +37,11 @@ def get_fecha_ultima_pole():
     yyyy"
 
     '''
-    data = open("date.txt","r") 
+    data = read_lineas_archivo("date.txt") 
     
-    day = int (data.readline())
-    month = int (data.readline())
-    year = int(data.readline())
+    day = int(data[0])
+    month = int (data[1])
+    year = int(data[2])
 
     return datetime.datetime(year,month,day)
 
@@ -38,7 +55,7 @@ def set_fecha_ultima_pole(fecha : datetime.datetime):
     data.close()
 
 
-def get_fecha_ultima_subpole():
+def read_fecha_ultima_subpole():
     '''
     Devuelve la fecha de la última subpole, en formato datetime.
 
@@ -49,13 +66,13 @@ def get_fecha_ultima_subpole():
     yyyy"
 
     '''
-    data = open("subdate.txt","r") 
+    data = read_lineas_archivo("subdate.txt") 
     
-    day = int (data.readline())
-    month = int (data.readline())
-    year = int(data.readline())
+    day = int(data[0])
+    month = int (data[1])
+    year = int(data[2])
 
-    return datetime.datetime(year,month,day)
+    return datetime.datetime(year, month, day)
 
 
 def set_fecha_ultima_subpole(fecha : datetime.datetime):
@@ -88,7 +105,7 @@ def get_ruta_archivo_puntuacion(nombre_usuario : str):
     return None
 
 
-def get_puntuacion(nombre : str):
+def read_puntuacion(nombre : str):
     """
     Devuelve la puntuación de un usuario.
     """
@@ -104,7 +121,7 @@ def get_puntuacion(nombre : str):
     return output
 
 
-def get_all_puntuaciones():
+def read_all_puntuaciones():
     """
     Devuelve una lista con los nombres de los usuarios y sus puntuaciones actuales.
 
@@ -113,18 +130,18 @@ def get_all_puntuaciones():
     output = []
 
     for i in USUARIOS:
-        output.append((i, get_puntuacion(i)))
+        output.append((i, read_puntuacion(i)))
 
     return output
 
 
-def get_all_puntuaciones_ordenadas():
+def read_all_puntuaciones_ordenadas():
     """
     Devuelve una lista con los nombres de los usuarios y sus puntuaciones actuales, ordenados.
 
     None -> list(tuple(str, int))
     """
-    output = get_all_puntuaciones()
+    output = read_all_puntuaciones()
 
     for mx in range(len(output) - 1, -1, -1):
             swapped = False
@@ -141,11 +158,27 @@ def get_all_puntuaciones_ordenadas():
     return output
 
 
-def get_distancia_al_anterior(usuario : str):
+def read_ranking_season_1():
+    '''
+    None -> list(tuple(str, int))
+
+    Devuelve las puntuaciones de la season 1.
+    '''
+    data = read_lineas_archivo("ranking s1.txt")
+
+    output = []
+
+    for i in range(0, len(data), 2):
+        output.append((i, int(i + 1)))
+
+    return output
+
+
+def read_distancia_al_anterior(usuario : str):
     '''
     Devuelve la distancia del usuario con el usuario que va delante suya.
     '''
-    scores = get_all_puntuaciones_ordenadas()
+    scores = read_all_puntuaciones_ordenadas()
 
     for i in range(1, len(scores)):
         if scores[i][0] == usuario:
@@ -161,7 +194,7 @@ def set_puntuacion(nombre : str, puntuacion : int):
     ruta = get_ruta_archivo_puntuacion(nombre)
 
     if ruta == None:
-        raise RuntimeError("No existe puntuación para " + nombre) 
+        raise Exception("No existe puntuación para " + nombre) 
 
     data = open(ruta, "w")
     data.writelines([str(puntuacion)])
@@ -210,27 +243,12 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    Frases = [
-        'ARRIBA ESPAÑA',
-        'martilux gei',
-        'oskiyu regei',
-        'moha pelota',
-        'charlie es el mejor desarrollador de bots',
-        'charlie gei',
-        'charlie regei',
-        'charlie supergei',
-        'charlie MEGAgei',
-        'charlie MASTERGEI',
-        'oskiyu regei',
-        'oskiyu superguei',
-        'oskiyu MASTERGEI'
-    ]
-    
+
     #Funcionalidad de la funcion
 
     #Frase random
     if message.content.lower() == 'polebot di algo':
-        await message.channel.send(random.choice(Frases))
+        await message.channel.send(random.choice(read_lineas_archivo("frases.txt")))
         
     #Bot gei
     elif message.content.lower() == 'polebot eres gei':
@@ -238,7 +256,7 @@ async def on_message(message):
 
     #Pole
     elif message.content.lower() == 'pole':
-        fecha_ultima_pole = get_fecha_ultima_pole()
+        fecha_ultima_pole = read_fecha_ultima_pole()
 
         if datetime.datetime.now() > fecha_ultima_pole:
             #Es una pole válida
@@ -252,10 +270,10 @@ async def on_message(message):
             set_fecha_ultima_pole(fecha_ultima_pole)
 
             #Lee la puntuación de quien ha hecho la pole
-            score = get_puntuacion(message.author.name)
+            score = read_puntuacion(message.author.name)
 
             #Comprueba si se puede aplicar el bufo
-            distancia = get_distancia_al_anterior(message.author.name)
+            distancia = read_distancia_al_anterior(message.author.name)
             
             response = ""
 
@@ -275,7 +293,7 @@ async def on_message(message):
 
     #Subpole
     elif message.content.lower() == 'subpole':
-        fecha_ultima_subpole = get_fecha_ultima_subpole()
+        fecha_ultima_subpole = read_fecha_ultima_subpole()
 
         if datetime.datetime.now() > fecha_ultima_subpole:
             #Es una pole válida
@@ -289,7 +307,7 @@ async def on_message(message):
             set_fecha_ultima_subpole(fecha_ultima_subpole)
 
             #Lee la puntuación de quien ha hecho la pole
-            score = get_puntuacion(message.author.name)
+            score = read_puntuacion(message.author.name)
             
             score += PUNTOS_POR_SUBPOLE
             response = message.author.name + ' ha hecho la subpole.' 
@@ -301,7 +319,7 @@ async def on_message(message):
 
     #Ranking actual
     elif message.content.lower() == 'polebot ranking':
-        scores = get_all_puntuaciones_ordenadas()
+        scores = read_all_puntuaciones_ordenadas()
 
         response = 'RANKING:' + '\n'
         
@@ -311,40 +329,50 @@ async def on_message(message):
         await message.channel.send(response)
 
     elif message.content.lower() == 'polebot ranking historico':
+        scores = read_all_puntuaciones()
+        scores_s1 = read_ranking_season_1()
 
-        data = open("charlie.txt","r")
-        score1 = float (data.readline())
-        data.close()
-        data = open("martilux.txt","r") 
-        score2 = float (data.readline())
-        data.close()
-        data = open("moha.txt","r") 
-        score3 = float (data.readline())
-        data.close()
-        data = open("oskiyu.txt","r") 
-        score4 = float (data.readline())
-        data.close()
-        #TODO: cambiar para la proxima season la forma de los scores
-        scores = [['charlie :third_place: : ',score1+95],['martilux :first_place: : ',score2+278],['moha: ' ,score3+70],['oskiyu :second_place: : ',score4+115]]
-        for mx in range(len(scores)-1, -1, -1):
+        for i in range(len(scores)):
+            for j in range(len(scores_s1)):
+                if scores_s1[j][0].find(scores[i][0]) != -1:
+                    scores[i][1] += scores_s1[j][1]
+
+
+        for mx in range(len(scores) - 1, -1, -1):
             swapped = False
+
             for i in range(mx):
                 if scores[i][1] < scores[i+1][1]:
                     scores[i], scores[i+1] = scores[i+1], scores[i]
                     swapped = True
+
             if not swapped:
                 break
-        response = 'RANKING HISTORICO:' + '\n' +scores[0][0]  + str(scores[0][1] ) + '\n' +scores[1][0]  + str(scores[1][1] ) + '\n' +scores[2][0]  + str(scores[2][1] ) + '\n' +scores[3][0]  + str(scores[3][1] )
+        
+        response = 'RANKING HISTORICO: \n'
+        
+        for i in range(len(scores)):
+            response += scores[i][0] + ": " + str(scores[i][1]) + '\n'
+         
         await message.channel.send(response)
 
     #Ranking S1
     elif message.content.lower() == 'polebot ranking season 1':
-        response = 'RANKING SEASON 1: ' + '\n' + ':first_place: martilux: 278' + '\n' + ':second_place: oskiyu: 115' + '\n' + ':third_place: charlie: 95' + '\n' + 'moha: 70'
+        response = 'RANKING SEASON 1: \n'
+
+        ranking = read_ranking_season_1()
+
+        for i in range(0, len(ranking)):
+            response += ranking[i][0] + ": " + ranking[i][1]
+
         await message.channel.send(response)    
 
     #Ayudas
     elif message.content.lower() == 'polebot ayuda':
-        response = 'Comandos:'+ '\n' + 'polebot ranking: Muestra el ranking de poles' + '\n' + 'polebot ranking historico: Muestra el ranking historico de poles' + '\n' + 'polebot ranking season 1: Muestra el ranking de poles de la season 1'+ '\n' + 'polebot di algo: El bot dice una frase aleatoria' + '\n' + 'polebot version: La versión del bot' '\n' + 'polebot git: Link al repositorio del polebot. Contribuye al polebot o consulta el código'+ '\n' + 'polebot si o no: ¿Una decisión importante?,deja que polebot decida por ti' + '\n' + "polebot ppt: Una partidita de piedra, papel o tijeras con el polebot" 
+        response = ""
+
+        for i in read_lineas_archivo("comandos_help.txt"):
+            response += i + '\n'
         
         await message.channel.send(response)
         
@@ -354,7 +382,7 @@ async def on_message(message):
 
     #Version
     elif message.content.lower() == 'polebot version':
-        response = 'PoleBot Versión Alpha 0.0.3.2 por CharlieC & oskiyu' + '\n' + 'Última actualización : 24/06/2021'
+        response = 'PoleBot Versión Alpha 0.0.3.3 por CharlieC & oskiyu' + '\n' + 'Última actualización : 24/06/2021'
         await message.channel.send(response)    
 
     #SIono
