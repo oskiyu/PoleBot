@@ -354,7 +354,7 @@ async def on_message(message):
 
     #Version
     elif message.content.lower() == 'polebot version':
-        response = 'PoleBot Versión Alpha 0.0.3.1 por CharlieC & oskiyu' + '\n' + 'Última actualización : 24/06/2021'
+        response = 'PoleBot Versión Alpha 0.0.3.2 por CharlieC & oskiyu' + '\n' + 'Última actualización : 24/06/2021'
         await message.channel.send(response)    
 
     #SIono
