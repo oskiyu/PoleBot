@@ -3,6 +3,10 @@
 Esta es una versión de prueba de PoleBot, Polebot está aún en desarrollo y aún necesita ser optimizado.
 ## Historial de cambios 📋
 
+### Versión 0.0.3.2: 
+> By oskiyu
+- Bugfix: la puntuación del ranking se muestra correctamente.
+  
 ### Versión 0.0.3.1: 
 > By oskiyu
 - Cambios internos, mejora del código.

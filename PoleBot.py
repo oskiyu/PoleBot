@@ -106,9 +106,9 @@ def get_puntuacion(nombre : str):
 
 def get_all_puntuaciones():
     """
-    Devuelve una lista con los nombre sde los usuarios y sus puntuaciones actuales.
+    Devuelve una lista con los nombres de los usuarios y sus puntuaciones actuales.
 
-    None -> list(tuple(str))
+    None -> list(tuple(str, int))
     """
     output = []
 
@@ -116,6 +116,42 @@ def get_all_puntuaciones():
         output.append((i, get_puntuacion(i)))
 
     return output
+
+
+def get_all_puntuaciones_ordenadas():
+    """
+    Devuelve una lista con los nombres de los usuarios y sus puntuaciones actuales, ordenados.
+
+    None -> list(tuple(str, int))
+    """
+    output = get_all_puntuaciones()
+
+    for mx in range(len(output) - 1, -1, -1):
+            swapped = False
+
+            for i in range(mx):
+
+                if output[i][1] < output[i + 1][1]:
+                    output[i], output[i + 1] = output[i + 1], output[i]
+                    swapped = True
+
+            if not swapped:
+                break
+
+    return output
+
+
+def get_distancia_al_anterior(usuario : str):
+    '''
+    Devuelve la distancia del usuario con el usuario que va delante suya.
+    '''
+    scores = get_all_puntuaciones_ordenadas()
+
+    for i in range(1, len(scores)):
+        if scores[i][0] == usuario:
+            return scores[i - 1][1] - scores[i][1]
+        
+    return 0
 
 
 def set_puntuacion(nombre : str, puntuacion : int):
@@ -132,9 +168,9 @@ def set_puntuacion(nombre : str, puntuacion : int):
     data.close
 
 
-def get_puntos_bufo(distancia : float):
+def get_puntos_bufo(distancia : int):
     """
-    float -> int
+    int -> int
 
     Devuelve los puntos obtenidos por el bufo.
     """
@@ -189,25 +225,7 @@ async def on_message(message):
         'oskiyu superguei',
         'oskiyu MASTERGEI'
     ]
-
-    def calcularDistanciaAnterior(name):
-        scores = get_all_puntuaciones()
-
-        for mx in range(len(scores)-1, -1, -1):
-            swapped = False
-            for i in range(mx):
-                if scores[i][1] < scores[i+1][1]:
-                    scores[i], scores[i+1] = scores[i+1], scores[i]
-                    swapped = True
-            if not swapped:
-                break
-
-        for i in range(1, len(scores)):
-            if scores[i][0] == name:
-                return scores[i - 1][1] - scores[i][1]
-        
-        return 0
-
+    
     #Funcionalidad de la funcion
 
     #Frase random
@@ -237,7 +255,7 @@ async def on_message(message):
             score = get_puntuacion(message.author.name)
 
             #Comprueba si se puede aplicar el bufo
-            distancia = calcularDistanciaAnterior(message.author.name)
+            distancia = get_distancia_al_anterior(message.author.name)
             
             response = ""
 
@@ -283,21 +301,12 @@ async def on_message(message):
 
     #Ranking actual
     elif message.content.lower() == 'polebot ranking':
-        scores = get_all_puntuaciones()
-
-        for mx in range(len(scores)-1, -1, -1):
-            swapped = False
-            for i in range(mx):
-                if scores[i][1] < scores[i+1][1]:
-                    scores[i], scores[i+1] = scores[i+1], scores[i]
-                    swapped = True
-            if not swapped:
-                break
+        scores = get_all_puntuaciones_ordenadas()
 
         response = 'RANKING:' + '\n'
         
         for i in range(0, len(scores)):
-            response += scores[i][0] + str(scores[i][1]) + '\n'
+            response += scores[i][0] + ": " + str(scores[i][1]) + '\n'
             
         await message.channel.send(response)
 
