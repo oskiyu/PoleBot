@@ -1,0 +1,8 @@
+:first_place: martilux
+278
+:second_place: oskiyu
+115
+:third_place: charlie
+95
+moha
+70
