@@ -169,7 +169,7 @@ def read_ranking_season_1():
     output = []
 
     for i in range(0, len(data), 2):
-        output.append((i, int(i + 1)))
+        output.append((data[i], data[int(i + 1)]))
 
     return output
 
