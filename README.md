@@ -3,6 +3,12 @@
 Esta es una versión de prueba de PoleBot, Polebot está aún en desarrollo y aún necesita ser optimizado.
 ## Historial de cambios 📋
 
+### Versión 0.0.3.4: 
+> By oskiyu
+- Ahora las frases, los comandos y los rankings se guardan en la RAM.
+    - Se cargan al iniciar el PoleBot.
+    - Se pueden recargar con el comando _`polebot reload`_.
+
 ### Versión 0.0.3.3: 
 > By oskiyu
 - Ahora las frases y los comandos se guardan en archivos `<.txt>`.

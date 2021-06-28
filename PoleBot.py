@@ -200,6 +200,8 @@ def set_puntuacion(nombre : str, puntuacion : int):
     data.writelines([str(puntuacion)])
     data.close
 
+    reload()
+
 
 def get_puntos_bufo(distancia : int):
     """
@@ -210,6 +212,25 @@ def get_puntos_bufo(distancia : int):
     return int(distancia / 10.0)
 
 
+def get_medalla(posicion : int):
+    '''
+    int -> str
+
+    Devueve una medalla que indica la posición en el ranking.
+    El primero es el 1, 2, 3... (no empieza por 0).
+    '''
+    if posicion == 0:
+        return ":first_place:"
+        
+    if posicion == 0:
+        return ":second_place:"
+        
+    if posicion == 0:
+        return ":third_place:"
+    
+    return " "
+
+
 # Distancia mínima entre una persona y la siguiente para aplicar el bufo.
 MIN_DIFF_FOR_BUFF = 40
 
@@ -217,8 +238,64 @@ PUNTOS_POR_POLE = 2
 PUNTOS_POR_SUBPOLE = 1
 
 
+#Sistema de cache
+
+frases = None
+ayuda_comandos = None
+
+puntuaciones = None
+
+ranking_season_1 = None
+ranking_historico = None
+
+def reload():
+    '''
+    Recarga los archivos frases.txt, comandos_help.txy
+    y todas las puntuaciones.
+    '''
+
+    #Para poder asignar valores a las variables globales,
+    # en vez de que se creen variables locales con el '='.
+    global frases
+    global ayuda_comandos
+    global puntuaciones
+    global ranking_season_1
+    global ranking_historico
+
+    frases = read_lineas_archivo("frases.txt")
+    ayuda_comandos = read_lineas_archivo("comandos_help.txt")
+
+    puntuaciones = read_all_puntuaciones_ordenadas()
+
+    ranking_season_1 = read_ranking_season_1()
+
+    #Historico:
+    ranking_historico = puntuaciones
+
+    #SUuar puntuaciones de la primera temporada
+    for i in range(len(ranking_historico)):
+        for j in range(len(ranking_season_1)):
+
+            #Si los nombres son iguales, se suman los puntos
+            if ranking_season_1[j][0].find(ranking_historico[i][0]) != -1:
+                ranking_historico[i][1] += ranking_season_1[j][1]
+
+    #Reordenar
+    for mx in range(len(ranking_historico) - 1, -1, -1):
+        swapped = False
+
+        for i in range(mx):
+            if ranking_historico[i][1] < ranking_historico[i+1][1]:
+                ranking_historico[i], ranking_historico[i+1] = ranking_historico[i+1], ranking_historico[i]
+                swapped = True
+
+        if not swapped:
+             break
+    
 
 #Bot
+
+reload()
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -246,9 +323,13 @@ async def on_message(message):
 
     #Funcionalidad de la funcion
 
+    #Recarga las frases, los comandos y los rankings
+    if (message.content.lower() == "polebot reload"):
+        reload()
+
     #Frase random
-    if message.content.lower() == 'polebot di algo':
-        await message.channel.send(random.choice(read_lineas_archivo("frases.txt")))
+    elif message.content.lower() == 'polebot di algo':
+        await message.channel.send(random.choice(frases))
         
     #Bot gei
     elif message.content.lower() == 'polebot eres gei':
@@ -288,7 +369,7 @@ async def on_message(message):
 
             #Actualiza la última pole en disco
             set_puntuacion(message.author.name, score)
-
+          
             await message.channel.send(response)
 
     #Subpole
@@ -319,40 +400,18 @@ async def on_message(message):
 
     #Ranking actual
     elif message.content.lower() == 'polebot ranking':
-        scores = read_all_puntuaciones_ordenadas()
-
         response = 'RANKING:' + '\n'
         
-        for i in range(0, len(scores)):
-            response += scores[i][0] + ": " + str(scores[i][1]) + '\n'
+        for i in range(0, len(puntuaciones)):
+            response += puntuaciones[i][0] + ": " + str(puntuaciones[i][1]) + '\n'
             
         await message.channel.send(response)
 
     elif message.content.lower() == 'polebot ranking historico':
-        scores = read_all_puntuaciones()
-        scores_s1 = read_ranking_season_1()
-
-        for i in range(len(scores)):
-            for j in range(len(scores_s1)):
-                if scores_s1[j][0].find(scores[i][0]) != -1:
-                    scores[i][1] += scores_s1[j][1]
-
-
-        for mx in range(len(scores) - 1, -1, -1):
-            swapped = False
-
-            for i in range(mx):
-                if scores[i][1] < scores[i+1][1]:
-                    scores[i], scores[i+1] = scores[i+1], scores[i]
-                    swapped = True
-
-            if not swapped:
-                break
-        
         response = 'RANKING HISTORICO: \n'
         
-        for i in range(len(scores)):
-            response += scores[i][0] + ": " + str(scores[i][1]) + '\n'
+        for i in range(len(ranking_historico)):
+            response += ranking_historico[i][0] + ": " + str(ranking_historico[i][1]) + '\n'
          
         await message.channel.send(response)
 
@@ -360,10 +419,8 @@ async def on_message(message):
     elif message.content.lower() == 'polebot ranking season 1':
         response = 'RANKING SEASON 1: \n'
 
-        ranking = read_ranking_season_1()
-
-        for i in range(0, len(ranking)):
-            response += ranking[i][0] + ": " + ranking[i][1]
+        for i in range(0, len(ranking_season_1)):
+            response += ranking_season_1[i][0] + ": " + ranking_season_1[i][1]
 
         await message.channel.send(response)    
 
@@ -371,7 +428,7 @@ async def on_message(message):
     elif message.content.lower() == 'polebot ayuda':
         response = ""
 
-        for i in read_lineas_archivo("comandos_help.txt"):
+        for i in ayuda_comandos:
             response += i + '\n'
         
         await message.channel.send(response)
@@ -382,7 +439,7 @@ async def on_message(message):
 
     #Version
     elif message.content.lower() == 'polebot version':
-        response = 'PoleBot Versión Alpha 0.0.3.3 por CharlieC & oskiyu' + '\n' + 'Última actualización : 24/06/2021'
+        response = 'PoleBot Versión Alpha 0.0.3.4 por CharlieC & oskiyu' + '\n' + 'Última actualización : 28/06/2021'
         await message.channel.send(response)    
 
     #SIono

@@ -7,3 +7,4 @@ Comandos:
     polebot git: Link al repositorio del polebot. Contribuye al polebot o consulta el código
     polebot si o no: ¿Una decisión importante?,deja que polebot decida por ti
     polebot ppt: Una partidita de piedra, papel o tijeras con el polebot
+    polebot reload: Recarga los datos de PoleBot: ayuda, frases y rankings
