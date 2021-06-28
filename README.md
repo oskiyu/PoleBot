@@ -3,6 +3,10 @@
 Esta es una versión de prueba de PoleBot, Polebot está aún en desarrollo y aún necesita ser optimizado.
 ## Historial de cambios 📋
 
+### Versión 0.0.4.0: 
+> By oskiyu
+- Ahora PoleBot funciona con la API de comandos de Discord.
+    
 ### Versión 0.0.3.4: 
 > By oskiyu
 - Ahora las frases, los comandos y los rankings se guardan en la RAM.

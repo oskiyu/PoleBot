@@ -300,11 +300,249 @@ reload()
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-client = discord.Client()
+client = discord.Bot('/')
+
+
+#Comandos:
+
+@client.command(
+    name = "polebot reload",
+    help = "Recarga los datos de PoleBot: ayuda, frases y rankings.",
+    brief = "Recarga el PoleBot."
+)
+async def cmd_reload(context):
+    '''
+    Recarga las frases, los comandos y los rankings
+    '''
+    reload()
+
+
+@client.command(
+    name = "polebot di algo",
+    help = "El bot dice una frase aleatoria.",
+    brief = "El bot dice una frase aleatoria."
+)
+async def cmd_frases(context):
+    '''
+    Frases random
+    '''
+    await context.channel.send(random.choice(frases))
+
+
+@client.command(
+    name = "pole",
+    help = "Reclama la pole.",
+    brief = "Reclama la pole."
+)
+async def cmd_pole(context):
+    '''
+    Pole.
+    '''
+    fecha_ultima_pole = read_fecha_ultima_pole()
+
+    if datetime.datetime.now() > fecha_ultima_pole:
+        #Es una pole válida
+
+        #Actualiza la pole en el disco duro
+        fecha_ultima_pole = datetime.datetime.now()
+
+        fecha_ultima_pole += timedelta(days = 1)
+        fecha_ultima_pole = fecha_ultima_pole.replace(hour = 00, minute = 00, second = 00)
+
+        set_fecha_ultima_pole(fecha_ultima_pole)
+
+        #Lee la puntuación de quien ha hecho la pole
+        score = read_puntuacion(context.message.author.name)
+
+        #Comprueba si se puede aplicar el bufo
+        distancia = read_distancia_al_anterior(context.message.author.name)
+            
+        response = ""
+
+        #Puntos del bufo
+        if distancia > MIN_DIFF_FOR_BUFF:
+            score += get_puntos_bufo(distancia)
+            response = context.message.author.name + ' ha hecho la pole.' + ' ¡Puntos aumentados por ir muy lejos de tu rival!' + ' Puntos obtenidos: '+ str(distancia/10)
+        #Puntuación normal
+        else:
+            score += PUNTOS_POR_POLE
+            response = context.message.author.name + ' ha hecho la pole.' 
+
+        #Actualiza la última pole en disco
+        set_puntuacion(context.message.author.name, score)
+          
+        await context.channel.send(response)
+    
+
+@client.command(
+    name = "subpole",
+    help = "Reclama la subpole.",
+    brief = "Reclama la subpole."
+)
+async def cmd_subpole(context):
+    '''
+    Subpole.
+    '''
+    fecha_ultima_subpole = read_fecha_ultima_subpole()
+
+    if datetime.datetime.now() > fecha_ultima_subpole:
+        #Es una pole válida
+
+        #Actualiza la pole en el disco duro
+        fecha_ultima_subpole = datetime.datetime.now()
+
+        fecha_ultima_subpole += timedelta(days = 1)
+        fecha_ultima_subpole = fecha_ultima_subpole.replace(hour = 00, minute = 00, second = 00)
+
+        set_fecha_ultima_subpole(fecha_ultima_subpole)
+
+        #Lee la puntuación de quien ha hecho la pole
+        score = read_puntuacion(context.message.author.name)
+            
+        score += PUNTOS_POR_SUBPOLE
+        response = context.message.author.name + ' ha hecho la subpole.' 
+
+        #Actualiza la última pole en disco
+        set_puntuacion(context.message.author.name, score)
+
+        await context.channel.send(response)
+
+
+@client.command(
+    name = "polebot ranking",
+    help = "Muestra el ranking de la temporada actual.",
+    brief = "Ranking actual."
+)
+async def cmd_ranking(context):
+    '''
+    Muestra el ranking actual.
+    '''
+    response = 'RANKING:' + '\n'
+        
+    for i in range(0, len(puntuaciones)):
+        response += puntuaciones[i][0] + ": " + str(puntuaciones[i][1]) + '\n'
+            
+    await context.channel.send(response)
+
+
+@client.command(
+    name = "polebot ranking historico",
+    help = "Muestra el ranking de todas las temporadas.",
+    brief = "Ranking historico."
+)
+async def cmd_ranking_historico(context):
+    '''
+    Muestra el ranking historico.
+    '''
+    response = 'RANKING HISTORICO: \n'
+        
+    for i in range(len(ranking_historico)):
+        response += ranking_historico[i][0] + ": " + str(ranking_historico[i][1]) + '\n'
+         
+    await context.channel.send(response)
+
+
+@client.command(
+    name = "polebot ranking season 1",
+    help = "Muestra el ranking de la primera temporada.",
+    brief = "Ranking S1."
+)
+async def cmd_ranking_s1(context):
+    response = 'RANKING SEASON 1: \n'
+
+    for i in range(0, len(ranking_season_1)):
+        response += ranking_season_1[i][0] + ": " + ranking_season_1[i][1]
+
+    await context.channel.send(response)  
+
+
+@client.command(
+    name = "polebot ayuda",
+    help = "Muestra ayuda de los comandos.",
+    brief = "Help."
+)
+async def cmd_ayuda(context):
+    response = ""
+
+    for i in ayuda_comandos:
+        response += i + '\n'
+        
+    await context.channel.send(response)
+
+    
+@client.command(
+    name = "polebot git",
+    help = "Muestra el repositorio open-source de PoleBot..",
+    brief = "PoleBot en GitHub."
+)
+async def cmd_git(context):
+    await context.channel.send('https://github.com/cva21/PoleBot')
+
+
+@client.command(
+    name = "polebot version",
+    help = "Muestra la versión de PoleBot.",
+    brief = "Versión de PoleBot.."
+)
+async def cmd_version(context):
+    response = 'PoleBot Versión Alpha 0.0.4.0 por CharlieC & oskiyu' + '\n' + 'Última actualización : 28/06/2021'
+    await context.channel.send(response)    
+
+    
+@client.command(
+    name = "polebot si o no",
+    help = "PoleBot decide por ti.",
+    brief = "Kys PoleBot."
+)
+async def cmd_siono(context):
+    await context.channel.send(random.choice(["si","no"]))
+
+
+@client.command(
+    name = "polebot ppt",
+    help = "Juega a piedra, papel o tijeras con PoleBot.",
+    brief = "Kys PoleBot x2."
+)
+async def cmd_ppt(context, seleccion_player : str):
+    
+    CHOICES = ["piedra", "papel", "tijeras"]
+        
+    seleccion_polebot = random.choice(CHOICES)
+
+    respone = ""
+
+    if seleccion_player == seleccion_polebot:              
+        response = "Empate, me has leido la mente cabron"
+            
+    elif seleccion_player == "piedra":
+        if seleccion_polebot == "papel":
+            response = "Te jodes, el papel cubre a la piedra gei"
+        
+        else:
+            response = "Pff, romperás mis " + seleccion_polebot + " pero te rompo la cara"
+
+    elif seleccion_player == "papel":
+        if seleccion_polebot == "tijeras":
+            response = "JA!, las tijeras cortan el papel pelota"  
+        
+        else: 
+            response = "Buah, habia elegido " + seleccion_polebot + " pero eres un puto pelota y lo sabes" 
+
+    elif seleccion_player == "tijeras":
+        if seleccion_polebot == "piedra":
+                response = "TOMA!, la piedra rompe a las tijeras, como lo que yo le rompo a tu novia todas las noches." 
+                
+        else:
+           response = "Pff, habré perdido por elegir " + seleccion_polebot + " pero jamás tendrás una gótica culona la que tengo yo"  
+                    
+    else:
+        response = "cabron, ¿eres retrasado o que?, piedra papel o tijera."
+                
+    await context.channel.send(response)
+
 
 @client.event
 async def on_ready():
-    
     print(f'{client.user.name} has connected to Discord!')
 
 @client.event
@@ -314,182 +552,5 @@ async def on_member_join(member):
         f'Bienvenido, {member.name}, arriba España!'
     )
 
-@client.event
-async def on_message(message):
-    
-    if message.author == client.user:
-        return
-
-
-    #Funcionalidad de la funcion
-
-    #Recarga las frases, los comandos y los rankings
-    if (message.content.lower() == "polebot reload"):
-        reload()
-
-    #Frase random
-    elif message.content.lower() == 'polebot di algo':
-        await message.channel.send(random.choice(frases))
-        
-    #Bot gei
-    elif message.content.lower() == 'polebot eres gei':
-            await message.channel.send('Tu si que eres gei, ' + message.author.name + '.')
-
-    #Pole
-    elif message.content.lower() == 'pole':
-        fecha_ultima_pole = read_fecha_ultima_pole()
-
-        if datetime.datetime.now() > fecha_ultima_pole:
-            #Es una pole válida
-
-            #Actualiza la pole en el disco duro
-            fecha_ultima_pole = datetime.datetime.now()
-
-            fecha_ultima_pole += timedelta(days = 1)
-            fecha_ultima_pole = fecha_ultima_pole.replace(hour = 00, minute = 00, second = 00)
-
-            set_fecha_ultima_pole(fecha_ultima_pole)
-
-            #Lee la puntuación de quien ha hecho la pole
-            score = read_puntuacion(message.author.name)
-
-            #Comprueba si se puede aplicar el bufo
-            distancia = read_distancia_al_anterior(message.author.name)
-            
-            response = ""
-
-            #Puntos del bufo
-            if distancia > MIN_DIFF_FOR_BUFF:
-                score += get_puntos_bufo(distancia)
-                response = message.author.name + ' ha hecho la pole.' + ' ¡Puntos aumentados por ir muy lejos de tu rival!' + ' Puntos obtenidos: '+ str(distancia/10)
-            #Puntuación normal
-            else:
-                score += PUNTOS_POR_POLE
-                response = message.author.name + ' ha hecho la pole.' 
-
-            #Actualiza la última pole en disco
-            set_puntuacion(message.author.name, score)
-          
-            await message.channel.send(response)
-
-    #Subpole
-    elif message.content.lower() == 'subpole':
-        fecha_ultima_subpole = read_fecha_ultima_subpole()
-
-        if datetime.datetime.now() > fecha_ultima_subpole:
-            #Es una pole válida
-
-            #Actualiza la pole en el disco duro
-            fecha_ultima_subpole = datetime.datetime.now()
-
-            fecha_ultima_subpole += timedelta(days = 1)
-            fecha_ultima_subpole = fecha_ultima_subpole.replace(hour = 00, minute = 00, second = 00)
-
-            set_fecha_ultima_subpole(fecha_ultima_subpole)
-
-            #Lee la puntuación de quien ha hecho la pole
-            score = read_puntuacion(message.author.name)
-            
-            score += PUNTOS_POR_SUBPOLE
-            response = message.author.name + ' ha hecho la subpole.' 
-
-            #Actualiza la última pole en disco
-            set_puntuacion(message.author.name, score)
-
-            await message.channel.send(response)
-
-    #Ranking actual
-    elif message.content.lower() == 'polebot ranking':
-        response = 'RANKING:' + '\n'
-        
-        for i in range(0, len(puntuaciones)):
-            response += puntuaciones[i][0] + ": " + str(puntuaciones[i][1]) + '\n'
-            
-        await message.channel.send(response)
-
-    elif message.content.lower() == 'polebot ranking historico':
-        response = 'RANKING HISTORICO: \n'
-        
-        for i in range(len(ranking_historico)):
-            response += ranking_historico[i][0] + ": " + str(ranking_historico[i][1]) + '\n'
-         
-        await message.channel.send(response)
-
-    #Ranking S1
-    elif message.content.lower() == 'polebot ranking season 1':
-        response = 'RANKING SEASON 1: \n'
-
-        for i in range(0, len(ranking_season_1)):
-            response += ranking_season_1[i][0] + ": " + ranking_season_1[i][1]
-
-        await message.channel.send(response)    
-
-    #Ayudas
-    elif message.content.lower() == 'polebot ayuda':
-        response = ""
-
-        for i in ayuda_comandos:
-            response += i + '\n'
-        
-        await message.channel.send(response)
-        
-    #Repositorio de git
-    elif message.content.lower() == 'polebot git':
-        await message.channel.send('https://github.com/cva21/PoleBot')
-
-    #Version
-    elif message.content.lower() == 'polebot version':
-        response = 'PoleBot Versión Alpha 0.0.3.4 por CharlieC & oskiyu' + '\n' + 'Última actualización : 28/06/2021'
-        await message.channel.send(response)    
-
-    #SIono
-    elif message.content.lower() == 'polebot si o no':
-        await message.channel.send(random.choice(["si","no"]))
-
-    elif message.content.lower() == 'polebot ppt':    
-        #create a list of play options
-        t = ["piedra", "papel", "tijeras"]
-        #assign a random play to the computer
-        computer = t[random.randint(0,2)]
-
-        #set player to False
-        player = False
-       
-        response = "Piedra, Papel o Tijeras perro"
-        await message.channel.send(response)
-
-        while player == False:
-            players = await client.wait_for('message')
-            if players.content.lower() == computer:              
-                response = "Empate, me has leido la mente cabron" 
-                player = True
-            elif players.content.lower() == "piedra":
-                if computer == "papel":
-                    response = "Te jodes, el papel cubre a la piedra gei"
-                    player = True     
-                else:
-                    response = "Pff, romperás mis " + computer + " pero te rompo la cara"  
-                    player = True  
-            elif players.content.lower() == "papel":
-                if computer == "tijeras":
-                    response = "JA!, las tijeras cortan el papel pelota"  
-                    player = True
-                else: 
-                    response = "Buah, habia elegido " + computer + " pero eres un puto pelota y lo sabes" 
-                    player = True
-            elif players.content.lower() == "tijeras":
-                if computer == "piedra":
-                    response = "TOMA!, la piedra rompe a las tijeras, como lo que yo le rompo a tu novia todas las noches." 
-                    player = True
-                else:
-                    response = "Pff, habré perdido por elegir " + computer + " pero jamás tendrás una gótica culona la que tengo yo"  
-                    player = True 
-            else:
-                response = "cabron, ¿eres retrasado o que?, piedra papel o tijera."
-                player = False
-                
-        #player was set to True, but we want it to be False so the loop continues
-            await message.channel.send(response)           
-            computer = t[random.randint(0,2)]
 
 client.run(TOKEN)
