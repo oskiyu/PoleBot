@@ -3,7 +3,7 @@
 Esta es una versión de prueba de PoleBot, Polebot está aún en desarrollo y aún necesita ser optimizado.
 ## Historial de cambios 📋
 
-### Versión 0.0.4.1 & 0.0.4.2: 
+### Versión 0.0.4.1 & 0.0.4.2 & 0.0.4.3: 
 > By oskiyu
 - Bugfix: ahora se carga correctamente el ranking de la temporada 1.
     

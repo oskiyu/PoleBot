@@ -169,7 +169,7 @@ def read_ranking_season_1():
     output = []
 
     for i in range(0, len(data), 2):
-        output.append((data[i], int(data[int(i + 1)])))
+        output.append((data[i], int(data[i + 1])))
 
     return output
 
@@ -270,23 +270,23 @@ def reload():
     ranking_season_1 = read_ranking_season_1()
 
     #Historico:
-    ranking_historico = puntuaciones
+    ranking_historico = []
 
     #SUuar puntuaciones de la primera temporada
-    for i in range(len(ranking_historico)):
+    for i in range(len(puntuaciones)):
         for j in range(len(ranking_season_1)):
 
             #Si los nombres son iguales, se suman los puntos
-            if ranking_season_1[j][0].find(ranking_historico[i][0]) != -1:
-                ranking_historico[i][1] += ranking_season_1[j][1]
+            if ranking_season_1[j][0].find(puntuaciones[i][0]) != -1:
+                ranking_historico.append((puntuaciones[i][0], puntuaciones[i][1] + ranking_season_1[i][1]))
 
     #Reordenar
     for mx in range(len(ranking_historico) - 1, -1, -1):
         swapped = False
 
         for i in range(mx):
-            if ranking_historico[i][1] < ranking_historico[i+1][1]:
-                ranking_historico[i], ranking_historico[i+1] = ranking_historico[i+1], ranking_historico[i]
+            if ranking_historico[i][1] < ranking_historico[i + 1][1]:
+                ranking_historico[i], ranking_historico[i + 1] = ranking_historico[i + 1], ranking_historico[i]
                 swapped = True
 
         if not swapped:
